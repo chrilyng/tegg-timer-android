@@ -1,19 +1,19 @@
 package dk.siit.tegg.view;
 
 public class Clock {
-	private float lastTouchX;
-	private float lastTouchY;
-	private float rotation;
+    private float lastTouchX;
+    private float lastTouchY;
+    private float rotation;
     private float centerX;
     private float centerY;
 
     private int time;
 
-	public Clock(float centerX, float centerY) {
-		rotation = 0f;
+    public Clock(float centerX, float centerY) {
+        rotation = 0f;
         setCenterX(centerX);
         setCenterY(centerY);
-	}
+    }
 
     public double calculateRotation(float nex, float ney) {
 
@@ -40,7 +40,6 @@ public class Clock {
             clockwiseRotation = false;
         }
 
-
         if(clockwiseRotation)
             return 0;
 
@@ -65,29 +64,29 @@ public class Clock {
         return degrees;
     }
 
-	public float getLastTouchX() {
-		return lastTouchX;
-	}
+    public float getLastTouchX() {
+        return lastTouchX;
+    }
 
-	public void setLastTouchX(float lastTouchX) {
-		this.lastTouchX = lastTouchX-centerX;
-	}
+    public void setLastTouchX(float lastTouchX) {
+        this.lastTouchX = lastTouchX-centerX;
+    }
 
-	public float getLastTouchY() {
-		return lastTouchY;
-	}
+    public float getLastTouchY() {
+        return lastTouchY;
+    }
 
-	public void setLastTouchY(float lastTouchY) {
-		this.lastTouchY = lastTouchY-centerY;
-	}
+    public void setLastTouchY(float lastTouchY) {
+        this.lastTouchY = lastTouchY-centerY;
+    } 
 
-	public float getRotation() {
-		return rotation;
-	}
+    public float getRotation() {
+        return rotation;
+    }
 
-	public void setRotation(float rotation) {
-		this.rotation = rotation;
-	}
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
 
     public void setCenterX(float centerX) {
         this.centerX = centerX;

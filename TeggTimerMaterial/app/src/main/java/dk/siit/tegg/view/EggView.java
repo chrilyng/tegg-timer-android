@@ -17,48 +17,42 @@ import android.view.View;
 import dk.siit.tegg.R;
 
 public class EggView extends View {
-    public static final int MINUTE = 60000;
-    public static final int SECOND = 1000;
 
-	private List<Handler> handlers;
-	
-	public List<Handler> getHandlers() {
-		return handlers;
-	}
+    private List<Handler> handlers;
 
-	public void setHandlers(List<Handler> handlers) {
-		this.handlers = handlers;
-	}
+    public List<Handler> getHandlers() {
+        return handlers;
+    }
 
-	private boolean locked;
-	
-	//View
-	private Drawable clockIcon;
+    private boolean locked;
+
+    //View
+    private Drawable clockIcon;
 
     private int clockDiameter;
 
-	private Clock clock;
+    private Clock clock;
 
-	public EggView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+    public EggView(Context context, AttributeSet attrs) {
+        super(context, attrs);
         clockDiameter = getResources().getDimensionPixelSize(R.dimen.clock_diameter);
-		clockIcon = getResources().getDrawable(R.drawable.ring_num);
-		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EggView);
+        clockIcon = getResources().getDrawable(R.drawable.ring_num);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EggView);
         clockIcon.setBounds(0, 0, clockDiameter, clockDiameter);
 
 
         float centerx = clockDiameter/2+this.getLeft();
         float centery = clockDiameter/2+this.getTop();
 
-		setClock(new Clock(centerx, centery));
+        setClock(new Clock(centerx, centery));
         
         handlers = new ArrayList<Handler>();
 
-	}
-	
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
-    	super.onDraw(canvas);
+        super.onDraw(canvas);
         canvas.save();
         //Rotate the numbers around the center of the "egg"
 
@@ -68,12 +62,11 @@ public class EggView extends View {
         canvas.restore();
     }
     
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		Log.d("Touch","Motion event "+event.getAction());
-		final int action = event.getAction();
-		if(!isLocked()){
-		switch(action) {
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        final int action = event.getAction();
+        if(!isLocked()){
+        switch(action) {
             case MotionEvent.ACTION_DOWN: {
 
                 float x = event.getX();
@@ -121,53 +114,47 @@ public class EggView extends View {
             }
             default:
                 break;
-		}
-		}
-		return true;
-	}
-
-    public void startTicking() {
-
-        int rot = (int)-getClock().getRotation();
-        //remainingTime = rot*10;
-
+        }
+        }
+        return true;
     }
+
     public void updateTime(long timeLeft) {
         int fullRotation = (int) -(timeLeft/10000);
         getClock().setRotation(fullRotation);
         invalidate();
     }
 
-	public void updateRotation(int rotation) {
-		getClock().setRotation(rotation);
-		invalidate();
-	}
+    public void updateRotation(int rotation) {
+        getClock().setRotation(rotation);
+        invalidate();
+    }
 
-	public void notifyObservers() {
-		for (Handler handler: handlers) {
-			
-			Message message = handler.obtainMessage();
+    public void notifyObservers() {
+        for (Handler handler: handlers) {
+
+            Message message = handler.obtainMessage();
             getClock().setTime(-(int) getClock().getRotation() / 6);
-			message.arg1= getClock().getTime();
-			message.sendToTarget();
-		}
-	}
-	
-	
+            message.arg1= getClock().getTime();
+            message.sendToTarget();
+        }
+    }
 
-	public void setLocked(boolean locked) {
-		this.locked = locked;
-	}
 
-	public boolean isLocked() {
-		return locked;
-	}
 
-	public Clock getClock() {
-		return clock;
-	}
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
 
-	public void setClock(Clock clock) {
-		this.clock = clock;
-	}
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public Clock getClock() {
+        return clock;
+    }
+
+    public void setClock(Clock clock) {
+        this.clock = clock;
+    }
 }

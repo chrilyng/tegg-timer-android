@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TimerService extends Service {
-
     NotificationManager mNM;
 
     @Override
@@ -39,48 +38,38 @@ public class TimerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        long firstTime = intent.getLongExtra(TeggTimer.ALARM_TIME,10000);
+        long firstTime = intent.getLongExtra(TeggTimer.ALARM_TIME,TeggTimer.MINUTE);
 
         setAlarm(firstTime);
-
 
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-
         return mBinder;
     }
 
-    /**
-     * Show a notification while this service is running.
-     */
     private void showNotification(long timeTarget) {
-        // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = getText(R.string.alarm_service_started);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
-        builder.setTicker("Countdown");
-        // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification(android.R.drawable.stat_sys_warning, text,
+        builder.setTicker(text);
+
+        Notification alarmStatusNotification = new Notification(android.R.drawable.stat_sys_warning, text,
                 System.currentTimeMillis());
 
-        // The PendingIntent to launch our activity if the user selects this notification
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+        PendingIntent alarmIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, TeggTimer.class), 0);
 
 
         String timeNotification = text + ": " +SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(new Date(timeTarget));
 
-        // Set the info for the views that show in the notification panel.
-        notification.setLatestEventInfo(this, getText(R.string.alarm_service_label),
-                       timeNotification, contentIntent);
+        alarmStatusNotification.setLatestEventInfo(this, getText(R.string.alarm_service_label),
+                timeNotification, alarmIntent);
 
-        // Send the notification.
-        // We use a layout id because it is a unique number.  We use it later to cancel.
-        mNM.notify(R.string.alarm_service_started, notification);
+        mNM.notify(R.string.alarm_service_started, alarmStatusNotification);
     }
 
 
@@ -95,7 +84,6 @@ public class TimerService extends Service {
         am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 firstTime, mAlarmSender);
 
-        // show the icon in the status bar
         showNotification(System.currentTimeMillis()+time);
 
         Toast.makeText(this, R.string.repeating_scheduled,
@@ -104,13 +92,11 @@ public class TimerService extends Service {
 
 
     public void cancelAlarm() {
-        // And cancel the alarm.
         AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
         am.cancel(mAlarmSender);
 
         mNM.cancelAll();
 
-        // Tell the user about what we did.
         Toast.makeText(this, R.string.repeating_unscheduled,
                 Toast.LENGTH_LONG).show();
     }
