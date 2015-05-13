@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#444444"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".AlarmClock">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+        <LinearLayout
+            android:visibility="visible"
+            android:layout_width="@dimen/clock_diameter"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@color/background_material_dark"
+            >
+            <TextView
+                android:id="@+id/clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="40dip"
+                android:text="00:00"
+                android:typeface="monospace"
+                /></LinearLayout>
+        <ImageView
+            android:layout_width="@dimen/clock_diameter"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:src="@drawable/arrow"
+            android:layout_gravity="bottom"
+            android:layout_margin="0dip"/>
+        <FrameLayout
+            android:layout_width="@dimen/clock_diameter"
+            android:layout_height="@dimen/clock_diameter"
+            android:id="@+id/frame01"
+            android:layout_gravity="bottom"
+            android:layout_margin="0dip"
+            >
+            <ImageView
+                android:layout_width="@dimen/clock_diameter"
+                android:layout_height="@dimen/clock_diameter"
+                android:src="@drawable/ring_bg"
+                android:layout_gravity="bottom"
+                />
+            <dk.siit.tegg.view.EggView
+                android:id="@+id/ring_num"
+                app:layout_width="@dimen/clock_diameter"
+                android:layout_width="@dimen/clock_diameter"
+                android:layout_height="@dimen/clock_diameter"
+                android:src="@drawable/ring_num"
+                android:layout_gravity="top"
+                />
+        </FrameLayout>
+        <LinearLayout android:visibility="visible" android:layout_width="@dimen/clock_diameter" android:layout_height="wrap_content" android:orientation="horizontal">
+            <Button  android:id="@+id/ring_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/button_material_dark"
+                android:layout_weight="1"
+                android:text="Start"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

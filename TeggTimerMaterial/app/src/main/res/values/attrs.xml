@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>	
+	<declare-styleable name="EggView">
+        <attr name="layout_width" format="string" />
+    </declare-styleable>
+</resources>
