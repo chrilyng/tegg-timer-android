@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import dk.siit.tegg.R;
+import dk.siit.tegg.TeggTimer;
 
 public class EggView extends View {
 
@@ -37,9 +38,7 @@ public class EggView extends View {
         super(context, attrs);
         clockDiameter = getResources().getDimensionPixelSize(R.dimen.clock_diameter);
         clockIcon = getResources().getDrawable(R.drawable.ring_num);
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EggView);
         clockIcon.setBounds(0, 0, clockDiameter, clockDiameter);
-
 
         float centerx = clockDiameter/2+this.getLeft();
         float centery = clockDiameter/2+this.getTop();
@@ -83,12 +82,11 @@ public class EggView extends View {
 
                 double degrees = getClock().calculateRotation(x, y);
 
+                // Remember this touch position for the next move event
 
-                    // Remember this touch position for the next move event
-
-                    getClock().setLastTouchX(x);
-                    getClock().setLastTouchY(y);
-                    getClock().setRotation(getClock().getRotation() + (float)degrees);
+                getClock().setLastTouchX(x);
+                getClock().setLastTouchY(y);
+                getClock().setRotation(getClock().getRotation() + (float)degrees);
 
                 if(Math.abs(degrees)>1) {
                     notifyObservers();
@@ -120,7 +118,7 @@ public class EggView extends View {
     }
 
     public void updateTime(long timeLeft) {
-        int fullRotation = (int) -(timeLeft/10000);
+        int fullRotation = (int) -(timeLeft/10* TeggTimer.SECOND);
         getClock().setRotation(fullRotation);
         invalidate();
     }
@@ -139,8 +137,6 @@ public class EggView extends View {
             message.sendToTarget();
         }
     }
-
-
 
     public void setLocked(boolean locked) {
         this.locked = locked;

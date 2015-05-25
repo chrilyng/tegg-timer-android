@@ -47,11 +47,8 @@ public class Clock {
 
         //Distance to center from last touch using trig
         double lastSide = getLastTouchX()/Math.cos(Math.atan2(getLastTouchY(), getLastTouchX()));
-
         double oppoSide = dx/Math.cos(Math.atan2(dy, dx));
-
         double firstSide = latestX/Math.cos(Math.atan2(latestY, latestX));
-
 
         // Do the pythagoras for the triangles sides
         double a = lastSide;

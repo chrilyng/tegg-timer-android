@@ -85,9 +85,6 @@ public class TimerService extends Service {
                 firstTime, mAlarmSender);
 
         showNotification(System.currentTimeMillis()+time);
-
-        Toast.makeText(this, R.string.repeating_scheduled,
-                Toast.LENGTH_LONG).show();
     }
 
 
@@ -96,9 +93,6 @@ public class TimerService extends Service {
         am.cancel(mAlarmSender);
 
         mNM.cancelAll();
-
-        Toast.makeText(this, R.string.repeating_unscheduled,
-                Toast.LENGTH_LONG).show();
     }
 
     public class LocalBinder extends Binder {

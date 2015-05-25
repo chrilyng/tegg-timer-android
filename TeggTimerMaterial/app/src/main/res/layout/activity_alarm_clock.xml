@@ -28,6 +28,7 @@
                 android:textSize="40dip"
                 android:text="00:00"
                 android:typeface="monospace"
+                android:textColor="@color/primary_text_default_material_dark"
                 /></LinearLayout>
         <ImageView
             android:layout_width="@dimen/clock_diameter"
@@ -64,7 +65,8 @@
                 android:layout_height="wrap_content"
                 android:background="@color/button_material_dark"
                 android:layout_weight="1"
-                android:text="Start"
+                android:text="@string/alarm_start"
+                android:textColor="@color/primary_text_default_material_dark"
                 />
         </LinearLayout>
 
