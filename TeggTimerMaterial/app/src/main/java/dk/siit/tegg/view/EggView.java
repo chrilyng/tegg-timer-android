@@ -118,7 +118,7 @@ public class EggView extends View {
     }
 
     public void updateTime(long timeLeft) {
-        int fullRotation = (int) -(timeLeft/10* TeggTimer.SECOND);
+        int fullRotation = (int) -(timeLeft/(10* TeggTimer.SECOND));
         getClock().setRotation(fullRotation);
         invalidate();
     }
