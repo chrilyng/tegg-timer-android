@@ -12,8 +12,11 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
         >
         <LinearLayout
+            android:layout_centerInParent="true"
             android:visibility="visible"
             android:layout_width="@dimen/clock_diameter"
             android:layout_height="wrap_content"
@@ -30,18 +33,11 @@
                 android:typeface="monospace"
                 android:textColor="@color/primary_text_default_material_dark"
                 /></LinearLayout>
-        <ImageView
-            android:layout_width="@dimen/clock_diameter"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:src="@drawable/arrow"
-            android:layout_gravity="bottom"
-            android:layout_margin="0dip"/>
         <FrameLayout
             android:layout_width="@dimen/clock_diameter"
             android:layout_height="@dimen/clock_diameter"
             android:id="@+id/frame01"
-            android:layout_gravity="bottom"
+            android:layout_gravity="center"
             android:layout_margin="0dip"
             >
             <ImageView
