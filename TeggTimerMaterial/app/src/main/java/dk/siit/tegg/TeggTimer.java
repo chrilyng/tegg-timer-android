@@ -1,5 +1,6 @@
 package dk.siit.tegg;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
@@ -27,11 +28,13 @@ import java.util.List;
 
 import dk.siit.tegg.view.EggView;
 
-public class TeggTimer extends ActionBarActivity {
+public class TeggTimer extends Activity {
 	private List<CountDownTimer> mTimers;
 	private EggView mRingNum;
     private long mRemainingTime;
     private Intent mTimerService;
+
+    private boolean mFinished = false;
 
     protected Ringtone mRingtone;
 
@@ -52,6 +55,8 @@ public class TeggTimer extends ActionBarActivity {
 
         if(getIntent().getBooleanExtra(ALARM_BROADCAST, false)) {
             doBindService();
+
+            mFinished = true;
 
             Window window = getWindow();
 
@@ -107,6 +112,9 @@ public class TeggTimer extends ActionBarActivity {
         	public void onClick(View arg0) {
         		stopButton();
 
+
+                mFinished = false;
+
         		int rot = (int)-mRingNum.getClock().getRotation();
                 // Wheel updates every ten seconds
                 mRemainingTime = rot*10*SECOND;
@@ -128,13 +136,14 @@ public class TeggTimer extends ActionBarActivity {
 
                     @Override
                     public void onFinish() {
+                        mFinished = true;
                     }
                 });
 				for (CountDownTimer timer : mTimers) {
 					timer.start();
 				}
 				mRingNum.setLocked(true);
-        	};
+        	}
         });
     }
     
@@ -178,6 +187,8 @@ public class TeggTimer extends ActionBarActivity {
 	};
 
     private void resetAlarm() {
+        mFinished = true;
+
         TextView clock = (TextView) findViewById(R.id.clock);
         mRingNum.updateRotation(0);
         for (CountDownTimer timer : mTimers) {
@@ -223,8 +234,11 @@ public class TeggTimer extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        resetAlarm();
+        if(!mFinished)
+            resetAlarm();
+        else
+            finish();
+        //super.onBackPressed();
     }
 
     @Override
