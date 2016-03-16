@@ -38,9 +38,11 @@ public class TimerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        long firstTime = intent.getLongExtra(TeggTimer.ALARM_TIME,TeggTimer.MINUTE);
+        if(intent!=null) {
+            long firstTime = intent.getLongExtra(TeggTimer.ALARM_TIME, TeggTimer.MINUTE);
 
-        setAlarm(firstTime);
+            setAlarm(firstTime);
+        }
 
         return super.onStartCommand(intent, flags, startId);
     }
