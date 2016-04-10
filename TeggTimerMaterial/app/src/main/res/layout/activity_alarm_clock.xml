@@ -8,63 +8,45 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".AlarmClock">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_centerHorizontal="true"
-        android:gravity="center_horizontal"
-        >
-        <LinearLayout
-            android:layout_centerInParent="true"
-            android:visibility="visible"
-            android:layout_width="@dimen/clock_diameter"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:background="@color/background_material_dark"
-            >
             <TextView
                 android:id="@+id/clock"
-                android:layout_width="wrap_content"
+                android:layout_alignParentTop="true"
+                android:gravity="center_horizontal"
+                android:background="@color/background_material_dark"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="40dip"
                 android:text="00:00"
                 android:typeface="monospace"
                 android:textColor="@color/primary_text_default_material_dark"
-                /></LinearLayout>
+                />
         <FrameLayout
-            android:layout_width="@dimen/clock_diameter"
-            android:layout_height="@dimen/clock_diameter"
+            android:layout_below="@id/clock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:id="@+id/frame01"
-            android:layout_gravity="center"
-            android:layout_margin="0dip"
             >
             <ImageView
-                android:layout_width="@dimen/clock_diameter"
-                android:layout_height="@dimen/clock_diameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/frame01_ring_bg"
                 android:src="@drawable/ring_bg"
-                android:layout_gravity="bottom"
                 />
             <dk.siit.tegg.view.EggView
                 android:id="@+id/ring_num"
-                app:layout_width="@dimen/clock_diameter"
-                android:layout_width="@dimen/clock_diameter"
-                android:layout_height="@dimen/clock_diameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:src="@drawable/ring_num"
-                android:layout_gravity="top"
                 />
         </FrameLayout>
-        <LinearLayout android:visibility="visible" android:layout_width="@dimen/clock_diameter" android:layout_height="wrap_content" android:orientation="horizontal">
             <Button  android:id="@+id/ring_start"
-                android:layout_width="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/button_material_dark"
-                android:layout_weight="1"
                 android:text="@string/alarm_start"
                 android:textColor="@color/primary_text_default_material_dark"
                 />
-        </LinearLayout>
 
-    </LinearLayout>
 </RelativeLayout>
