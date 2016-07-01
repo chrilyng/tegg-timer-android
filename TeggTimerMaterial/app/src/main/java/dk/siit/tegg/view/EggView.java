@@ -57,7 +57,7 @@ public class EggView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
         int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-        
+
         clockDiameter = parentWidth;
         clockIcon = getResources().getDrawable(R.drawable.ring_num);
         clockIcon.setBounds(0, 0, clockDiameter, clockDiameter);
@@ -144,7 +144,7 @@ public class EggView extends View {
     public void notifyObservers(int time) {
         for (Handler handler: handlers) {
             Message message = handler.obtainMessage();
-            message.arg1= getClock().getTime();
+            message.arg1= time;
             message.sendToTarget();
         }
     }

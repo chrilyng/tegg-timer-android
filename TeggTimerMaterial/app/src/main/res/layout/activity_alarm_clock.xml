@@ -15,6 +15,7 @@
                 android:background="@color/background_material_dark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:textSize="40dip"
                 android:text="00:00"
                 android:typeface="monospace"
@@ -24,21 +25,22 @@
             android:layout_below="@id/clock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
             android:id="@+id/frame01"
             >
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/frame01_ring_bg"
-                android:src="@drawable/ring_bg"
-                />
+    <FrameLayout
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:layout_gravity="center_horizontal"
+        >
             <dk.siit.tegg.view.EggView
                 android:id="@+id/ring_num"
-                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ring_num"
+                android:background="@drawable/ring_bg"
                 />
+        </FrameLayout>
         </FrameLayout>
             <Button  android:id="@+id/ring_start"
                 android:layout_alignParentBottom="true"

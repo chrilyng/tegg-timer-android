@@ -83,7 +83,7 @@ public class TimerService extends Service {
 
         AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
 
-        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+        am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 firstTime, mAlarmSender);
 
         showNotification(System.currentTimeMillis()+time);
