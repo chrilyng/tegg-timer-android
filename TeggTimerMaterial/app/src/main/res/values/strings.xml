@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TeggTimer</string>
-
-<string name="repeating_unscheduled">Canceled Alarm</string>
-<string name="alarm_service_started">Scheduled </string>
-<string name="alarm_service_label">Alarm</string>
-<string name="alarm_service_finished">Finish</string>
+    <string name="repeating_unscheduled">Canceled Alarm</string>
+    <string name="alarm_service_started">Scheduled </string>
+    <string name="alarm_service_label">Alarm</string>
+    <string name="alarm_service_finished">Finish</string>
     <string name="alarm_start">Start</string>
     <string name="alarm_cancel">Cancel</string>
-<string name="repeating_scheduled">Starting Timer</string>
+    <string name="repeating_scheduled">Starting Timer</string>
+    <string name="time">00:00</string>
 </resources>
