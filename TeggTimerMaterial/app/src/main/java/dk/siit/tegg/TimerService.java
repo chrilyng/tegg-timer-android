@@ -1,5 +1,6 @@
 package dk.siit.tegg;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -7,22 +8,34 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
-import android.widget.Toast;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static dk.siit.tegg.TeggTimer.SECOND;
 
 public class TimerService extends Service {
     private NotificationManager mNM;
     private PendingIntent mAlarmSender;
     private final IBinder mBinder = new LocalBinder();
+    private CountDownTimer mCountDownTimer;
+    private List<CountdownCallback> mCountdownCallbackList;
+    private AlarmManager mAm;
 
     @Override
     public void onCreate() {
+        mCountdownCallbackList = new ArrayList<>();
+
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        mAm = (AlarmManager)getSystemService(ALARM_SERVICE);
 
         Intent intent = new Intent(this, TeggTimer.class);
         intent.putExtra(TeggTimer.ALARM_BROADCAST, true);
@@ -33,8 +46,8 @@ public class TimerService extends Service {
     public void onDestroy() {
         mNM.cancel(R.string.alarm_service_started);
 
-        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        am.cancel(mAlarmSender);
+        if(mAm!=null)
+            mAm.cancel(mAlarmSender);
     }
 
 
@@ -79,18 +92,44 @@ public class TimerService extends Service {
     public void setAlarm(long time) {
         long firstTime = SystemClock.elapsedRealtime()+time;
 
-        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+        if(mAm!=null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                mAm.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        firstTime, mAlarmSender);
+            } else {
+                mAm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        firstTime, mAlarmSender);
+            }
+        }
 
-        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                firstTime, mAlarmSender);
+        mCountDownTimer = new CountDownTimer(time, SECOND) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                for(CountdownCallback countdownCallback : mCountdownCallbackList) {
+                    countdownCallback.updateCountdown(millisUntilFinished);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                for(CountdownCallback countdownCallback : mCountdownCallbackList) {
+                    countdownCallback.updateCountdown(0);
+                }
+            }
+
+        };
+        mCountDownTimer.start();
 
         showNotification(System.currentTimeMillis()+time);
     }
 
 
     public void cancelAlarm() {
-        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        am.cancel(mAlarmSender);
+        mCountDownTimer.cancel();
+
+        if(mAm!=null)
+            mAm.cancel(mAlarmSender);
 
         mNM.cancelAll();
     }
@@ -99,5 +138,13 @@ public class TimerService extends Service {
         TimerService getService() {
             return TimerService.this;
         }
+    }
+
+    public void registerCallback(CountdownCallback callback) {
+        mCountdownCallbackList.add(callback);
+    }
+
+    public void unregisterCallback(CountdownCallback callback) {
+        mCountdownCallbackList.remove(callback);
     }
 }

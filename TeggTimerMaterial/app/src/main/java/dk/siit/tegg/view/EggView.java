@@ -64,6 +64,10 @@ public class EggView extends View {
 
         setClock(new Clock(centerx, centery));
         this.setMeasuredDimension(parentWidth, parentHeight);
+
+        for(AlarmCallback callback: alarmCallbacks) {
+            callback.viewMeasured();
+        }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 

@@ -12,50 +12,48 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import dk.siit.tegg.view.EggView;
 
-public class TeggTimer extends Activity implements AlarmCallback {
-	private List<CountDownTimer> mTimers;
+public class TeggTimer extends Activity implements AlarmCallback, CountdownCallback {
 	private EggView mRingNum;
+	private TextView mClock;
     private long mRemainingTime;
     private Intent mTimerService;
-
-    private boolean mFinished = false;
-
+    private TimerService mBoundTimerService;
+    private boolean mIsTimerServiceBound = false;
+    private boolean mFinished = true;
     protected Ringtone mRingtone;
+    private int mTimeSet = 0;
 
     public static final int MINUTE = 60000;
     public static final int SECOND = 1000;
 
     public static final String ALARM_BROADCAST = "TIMES_UP";
     public static final String ALARM_TIME = "FIRST_TIME";
+    private static final String EXTRA_FINISHED = "FINISH";
+    private static final String EXTRA_TIME_SET = "TIME_SET";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_clock);
+        doBindService();
+
+        mClock = (TextView) findViewById(R.id.clock);
+        mRingNum = (EggView) findViewById(R.id.ring_num);
+        mRingNum.registerAlarmCallback(this);
 
         Uri myUri =  RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         mRingtone = RingtoneManager.getRingtone(this, myUri);
 
-
-        if(getIntent().getBooleanExtra(ALARM_BROADCAST, false)) {
-            doBindService();
-
+        if(getIntent().getBooleanExtra(ALARM_BROADCAST, false)&&savedInstanceState==null) {
             mFinished = true;
 
             Window window = getWindow();
@@ -86,23 +84,8 @@ public class TeggTimer extends Activity implements AlarmCallback {
 
             mRingtone.play();
         }
-
-        mRingNum = (EggView) findViewById(R.id.ring_num);
-        mRingNum.registerAlarmCallback(this);
-        
-        mTimers = new ArrayList<CountDownTimer>();
-
-        startButton();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onUserInteraction() {
-       	super.onUserInteraction();
+        if(mFinished)
+            startButton();
     }
 
     public void startButton() {
@@ -111,7 +94,6 @@ public class TeggTimer extends Activity implements AlarmCallback {
         start.setOnClickListener(new Button.OnClickListener() {
         	public void onClick(View arg0) {
         		stopButton();
-
 
                 mFinished = false;
 
@@ -123,30 +105,32 @@ public class TeggTimer extends Activity implements AlarmCallback {
                 mTimerService.putExtra(ALARM_TIME, mRemainingTime);
                 startService(mTimerService);
                 doBindService();
-        		mTimers.add(new CountDownTimer(mRemainingTime, SECOND) {
-
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        TextView clock = (TextView) findViewById(R.id.clock);
-                        mRingNum.updateTime(millisUntilFinished);
-                        int min = (int) (millisUntilFinished / MINUTE);
-                        int sec = (int) ((millisUntilFinished % MINUTE) / SECOND);
-                        clock.setText(updateText(min, sec));
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        mFinished = true;
-                    }
-                });
-				for (CountDownTimer timer : mTimers) {
-					timer.start();
-				}
 				mRingNum.setLocked(true);
         	}
         });
     }
-    
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mFinished = savedInstanceState.getBoolean(EXTRA_FINISHED, true);
+        if(!mFinished) {
+            doBindService();
+            stopButton();
+        } else {
+            mTimeSet = savedInstanceState.getInt(EXTRA_TIME_SET);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(EXTRA_FINISHED, mFinished);
+        if(mFinished) {
+            outState.putInt(EXTRA_TIME_SET, mTimeSet);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
     public void stopButton() {
     	Button startButton = (Button) findViewById(R.id.ring_start);
         startButton.setText(getString(R.string.alarm_cancel));
@@ -160,8 +144,7 @@ public class TeggTimer extends Activity implements AlarmCallback {
 
     }
     
-    public String updateText(int min, int sec) {
-
+    public static String generateText(int min, int sec) {
     	String minText;
     	String secText;
     	if(min<10) {
@@ -178,30 +161,25 @@ public class TeggTimer extends Activity implements AlarmCallback {
     private void resetAlarm() {
         mFinished = true;
 
-        TextView clock = (TextView) findViewById(R.id.clock);
         mRingNum.updateRotation(0);
-        for (CountDownTimer timer : mTimers) {
-            timer.cancel();
-        }
-        mTimers.clear();
 
         if(mIsTimerServiceBound) {
             mBoundTimerService.cancelAlarm();
         }
-        clock.setText(updateText(0,0));
+        mClock.setText(generateText(0,0));
         mRingNum.setLocked(false);
         startButton();
     }
 
 
-    private TimerService mBoundTimerService;
-
     private ServiceConnection mTimerServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mBoundTimerService = ((TimerService.LocalBinder)service).getService();
+            mBoundTimerService.registerCallback(TeggTimer.this);
         }
 
         public void onServiceDisconnected(ComponentName className) {
+            mBoundTimerService.unregisterCallback(TeggTimer.this);
             mBoundTimerService = null;
         }
     };
@@ -219,26 +197,38 @@ public class TeggTimer extends Activity implements AlarmCallback {
         }
     }
 
-    private boolean mIsTimerServiceBound = false;
-
     @Override
     public void onBackPressed() {
         if(!mFinished)
             resetAlarm();
         else
             finish();
-        //super.onBackPressed();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         doUnbindService();
+        super.onDestroy();
     }
 
     @Override
     public void updateAlarm(int time) {
-        TextView clock = (TextView) findViewById(R.id.clock);
-        clock.setText(updateText(time, 0));
+        mTimeSet = time;
+        mClock.setText(generateText(mTimeSet, 0));
+    }
+
+    @Override
+    public void viewMeasured() {
+        if(mFinished) {
+            updateCountdown(mTimeSet * MINUTE);
+        }
+    }
+
+    @Override
+    public void updateCountdown(long time) {
+        mRingNum.updateTime(time);
+        int min = (int) (time / MINUTE);
+        int sec = (int) ((time % MINUTE) / SECOND);
+        mClock.setText(generateText(min, sec));
     }
 }
