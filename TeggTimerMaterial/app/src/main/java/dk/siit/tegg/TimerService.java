@@ -16,7 +16,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TimerService extends Service {
-    NotificationManager mNM;
+    private NotificationManager mNM;
+    private PendingIntent mAlarmSender;
+    private final IBinder mBinder = new LocalBinder();
 
     @Override
     public void onCreate() {
@@ -74,10 +76,6 @@ public class TimerService extends Service {
         mNM.notify(R.string.alarm_service_started, alarmStatusNotification);
     }
 
-
-    private PendingIntent mAlarmSender;
-
-
     public void setAlarm(long time) {
         long firstTime = SystemClock.elapsedRealtime()+time;
 
@@ -102,6 +100,4 @@ public class TimerService extends Service {
             return TimerService.this;
         }
     }
-
-    private final IBinder mBinder = new LocalBinder();
 }

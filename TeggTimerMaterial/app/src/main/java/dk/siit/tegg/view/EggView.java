@@ -15,17 +15,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import dk.siit.tegg.AlarmCallback;
 import dk.siit.tegg.R;
 import dk.siit.tegg.TeggTimer;
 
 public class EggView extends View {
     private static final int CLOCK_RATIO = 6; // 360 degrees divided by 60 minutes
 
-    private List<Handler> handlers;
-
-    public List<Handler> getHandlers() {
-        return handlers;
-    }
+    private List<AlarmCallback> alarmCallbacks;
 
     private boolean locked;
 
@@ -38,7 +35,7 @@ public class EggView extends View {
 
     public EggView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        handlers = new ArrayList<Handler>();
+        alarmCallbacks = new ArrayList<AlarmCallback>();
     }
 
     @Override
@@ -142,11 +139,13 @@ public class EggView extends View {
     }
 
     public void notifyObservers(int time) {
-        for (Handler handler: handlers) {
-            Message message = handler.obtainMessage();
-            message.arg1= time;
-            message.sendToTarget();
+        for (AlarmCallback alarmCallback: alarmCallbacks) {
+            alarmCallback.updateAlarm(time);
         }
+    }
+
+    public void registerAlarmCallback(AlarmCallback alarmCallback) {
+        alarmCallbacks.add(alarmCallback);
     }
 
     public void setLocked(boolean locked) {

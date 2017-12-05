@@ -28,7 +28,7 @@ import java.util.List;
 
 import dk.siit.tegg.view.EggView;
 
-public class TeggTimer extends Activity {
+public class TeggTimer extends Activity implements AlarmCallback {
 	private List<CountDownTimer> mTimers;
 	private EggView mRingNum;
     private long mRemainingTime;
@@ -88,7 +88,7 @@ public class TeggTimer extends Activity {
         }
 
         mRingNum = (EggView) findViewById(R.id.ring_num);
-        mRingNum.getHandlers().add(mTimerHandler);
+        mRingNum.registerAlarmCallback(this);
         
         mTimers = new ArrayList<CountDownTimer>();
 
@@ -175,17 +175,6 @@ public class TeggTimer extends Activity {
     	return minText+":"+secText;
     }
 
-    
-	private Handler mTimerHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			TextView clock = (TextView) findViewById(R.id.clock);
-			int time = msg.arg1;
-	       	clock.setText(updateText(time, 0));
-			super.handleMessage(msg);
-		}
-	};
-
     private void resetAlarm() {
         mFinished = true;
 
@@ -245,5 +234,11 @@ public class TeggTimer extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         doUnbindService();
+    }
+
+    @Override
+    public void updateAlarm(int time) {
+        TextView clock = (TextView) findViewById(R.id.clock);
+        clock.setText(updateText(time, 0));
     }
 }
