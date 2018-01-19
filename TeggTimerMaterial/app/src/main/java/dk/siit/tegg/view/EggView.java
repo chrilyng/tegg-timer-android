@@ -26,7 +26,6 @@ public class EggView extends View {
 
     private boolean locked;
 
-    //View
     private Drawable clockIcon;
 
     private int clockDiameter;
@@ -36,6 +35,7 @@ public class EggView extends View {
     public EggView(Context context, AttributeSet attrs) {
         super(context, attrs);
         alarmCallbacks = new ArrayList<AlarmCallback>();
+        clock = new Clock();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class EggView extends View {
         canvas.save();
         //Rotate the numbers around the center of the "egg"
 
-        canvas.rotate((float) getClock().getRotation(), clockDiameter/2, clockDiameter/2);
+        canvas.rotate(clock.getRotation(), clockDiameter/2, clockDiameter/2);
         //Draw the image on the canvas
         clockIcon.draw(canvas);
         canvas.restore();
@@ -61,8 +61,9 @@ public class EggView extends View {
 
         float centerx = clockDiameter/2;
         float centery = clockDiameter/2;
+        clock.setCenterX(centerx);
+        clock.setCenterY(centery);
 
-        setClock(new Clock(centerx, centery));
         this.setMeasuredDimension(parentWidth, parentHeight);
 
         for(AlarmCallback callback: alarmCallbacks) {
@@ -81,8 +82,8 @@ public class EggView extends View {
                 float x = event.getX();
                 float y = event.getY();
 
-                getClock().setLastTouchX(x);
-                getClock().setLastTouchY(y);
+                clock.setLastTouchX(x);
+                clock.setLastTouchY(y);
                 // Remember where we started
                 break;
             }
@@ -90,15 +91,15 @@ public class EggView extends View {
                 float x = event.getX();
                 float y = event.getY();
 
-                double degrees = getClock().calculateRotation(x, y);
+                double degrees = clock.calculateRotation(x, y);
 
                 // Remember this touch position for the next move event
 
-                getClock().setLastTouchX(x);
-                getClock().setLastTouchY(y);
-                getClock().setRotation(getClock().getRotation() + (float) degrees);
-                int time = - (int) getClock().getRotation() / CLOCK_RATIO;
-                getClock().setTime(time);
+                clock.setLastTouchX(x);
+                clock.setLastTouchY(y);
+                clock.setRotation(clock.getRotation() + (float) degrees);
+                int time = - (int) clock.getRotation() / CLOCK_RATIO;
+                clock.setTime(time);
 
                 if(Math.abs(degrees)>1) {
                     notifyObservers(time);
@@ -111,14 +112,14 @@ public class EggView extends View {
             //screen released
             case MotionEvent.ACTION_UP: {
 
-                int rotat = Math.round(getClock().getRotation());
+                int rotat = Math.round(clock.getRotation());
 
                 // round the 360 degrees to the 60 minutes in an hour
                 rotat = rotat/CLOCK_RATIO;
                 rotat = rotat*CLOCK_RATIO;
-                getClock().setRotation(rotat);
+                clock.setRotation(rotat);
                 int time = - rotat / CLOCK_RATIO;
-                getClock().setTime(time);
+                clock.setTime(time);
 
                 invalidate();
                 notifyObservers(time);
@@ -133,12 +134,12 @@ public class EggView extends View {
 
     public void updateTime(long timeLeft) {
         int fullRotation = (int) -(timeLeft/(10* TeggTimer.SECOND));
-        getClock().setRotation(fullRotation);
+        clock.setRotation(fullRotation);
         invalidate();
     }
 
     public void updateRotation(int rotation) {
-        getClock().setRotation(rotation);
+        clock.setRotation(rotation);
         invalidate();
     }
 

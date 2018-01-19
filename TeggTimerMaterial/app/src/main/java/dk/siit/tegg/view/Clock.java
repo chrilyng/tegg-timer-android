@@ -3,14 +3,16 @@ package dk.siit.tegg.view;
 public class Clock {
     private float lastTouchX;
     private float lastTouchY;
-    private float rotation;
+    private float rotation = 0f;
     private float centerX;
     private float centerY;
 
     private int time;
 
+    public Clock() {
+    }
+
     public Clock(float centerX, float centerY) {
-        rotation = 0f;
         setCenterX(centerX);
         setCenterY(centerY);
     }
@@ -23,20 +25,20 @@ public class Clock {
         float latestY = ney-centerY;
 
         // Calculate the distance moved
-        float dx = latestX - getLastTouchX();
-        float dy = latestY - getLastTouchY();
+        float dx = latestX - lastTouchX;
+        float dy = latestY - lastTouchY;
 
         // Only accept the counterclockwise rotations
-        if(latestX>0&&getLastTouchX()>0&&latestY>0&&getLastTouchY()>0&&dx>0&&dy<0) {
+        if(latestX>0&&lastTouchX>0&&latestY>0&&lastTouchY>0&&dx>0&&dy<0) {
             clockwiseRotation = false;
         }
-        if(latestX>0&&getLastTouchX()>0&&latestY<0&&getLastTouchY()<0&&dx<0&&dy<0) {
+        if(latestX>0&&lastTouchX>0&&latestY<0&&lastTouchY<0&&dx<0&&dy<0) {
             clockwiseRotation = false;
         }
-        if(latestX<0&&getLastTouchX()<0&&latestY<0&&getLastTouchY()<0&&dx<0&&dy>0) {
+        if(latestX<0&&lastTouchX<0&&latestY<0&&lastTouchY<0&&dx<0&&dy>0) {
             clockwiseRotation = false;
         }
-        if(latestX<0&&getLastTouchX()<0&&latestY>0&&getLastTouchY()>0&&dx>0&&dy>0) {
+        if(latestX<0&&lastTouchX<0&&latestY>0&&lastTouchY>0&&dx>0&&dy>0) {
             clockwiseRotation = false;
         }
 
@@ -46,7 +48,7 @@ public class Clock {
         // Find the lengths of the triangles sides using trig
 
         //Distance to center from last touch using trig
-        double lastSide = getLastTouchX()/Math.cos(Math.atan2(getLastTouchY(), getLastTouchX()));
+        double lastSide = lastTouchX/Math.cos(Math.atan2(lastTouchY, lastTouchX));
         double oppoSide = dx/Math.cos(Math.atan2(dy, dx));
         double firstSide = latestX/Math.cos(Math.atan2(latestY, latestX));
 

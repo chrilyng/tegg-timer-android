@@ -1,6 +1,5 @@
 package dk.siit.tegg;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
@@ -13,7 +12,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,7 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import dk.siit.tegg.view.EggView;
 
-public class TeggTimer extends Activity implements AlarmCallback, CountdownCallback {
+public class TeggTimer extends ActionBarActivity implements AlarmCallback, CountdownCallback {
 	private EggView mRingNum;
 	private TextView mClock;
     private long mRemainingTime;
@@ -71,7 +70,7 @@ public class TeggTimer extends Activity implements AlarmCallback, CountdownCallb
                     resetAlarm();
                 }
             });
-            builder.setTitle(getString(R.string.alarm_service_finished));
+            builder.setMessage(getString(R.string.alarm_service_finished));
             builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override
                 public void onCancel(DialogInterface dialog) {
@@ -143,20 +142,6 @@ public class TeggTimer extends Activity implements AlarmCallback, CountdownCallb
         });
 
     }
-    
-    public static String generateText(int min, int sec) {
-    	String minText;
-    	String secText;
-    	if(min<10) {
-    		minText = "0"+min;
-    	} else
-    		minText= ""+min;
-    	if(sec<10) {
-    		secText = "0"+sec;
-    	} else
-    		secText= ""+sec;
-    	return minText+":"+secText;
-    }
 
     private void resetAlarm() {
         mFinished = true;
@@ -170,19 +155,6 @@ public class TeggTimer extends Activity implements AlarmCallback, CountdownCallb
         mRingNum.setLocked(false);
         startButton();
     }
-
-
-    private ServiceConnection mTimerServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            mBoundTimerService = ((TimerService.LocalBinder)service).getService();
-            mBoundTimerService.registerCallback(TeggTimer.this);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            mBoundTimerService.unregisterCallback(TeggTimer.this);
-            mBoundTimerService = null;
-        }
-    };
 
     void doBindService() {
         bindService(new Intent(TeggTimer.this,
@@ -231,4 +203,30 @@ public class TeggTimer extends Activity implements AlarmCallback, CountdownCallb
         int sec = (int) ((time % MINUTE) / SECOND);
         mClock.setText(generateText(min, sec));
     }
+
+    public static String generateText(int min, int sec) {
+        String minText;
+        String secText;
+        if(min<10) {
+            minText = "0"+min;
+        } else
+            minText= ""+min;
+        if(sec<10) {
+            secText = "0"+sec;
+        } else
+            secText= ""+sec;
+        return minText+":"+secText;
+    }
+
+    private ServiceConnection mTimerServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mBoundTimerService = ((TimerService.LocalBinder)service).getService();
+            mBoundTimerService.registerCallback(TeggTimer.this);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mBoundTimerService.unregisterCallback(TeggTimer.this);
+            mBoundTimerService = null;
+        }
+    };
 }
