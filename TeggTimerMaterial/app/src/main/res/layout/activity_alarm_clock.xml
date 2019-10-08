@@ -1,46 +1,46 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#444444"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:layout_height="match_parent"
+    android:background="#444444"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin">
 
     <TextView
         android:id="@+id/clock"
+        style="@android:style/Widget.Material.TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:gravity="center_horizontal"
-        android:background="@color/background_material_dark"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:textSize="40sp"
+        android:gravity="center_horizontal"
         android:text="@string/time"
-        android:typeface="monospace"
-        android:textColor="@color/primary_text_default_material_dark"
-        />
+        android:textAppearance="@android:style/TextAppearance.Material.Display1"
+        android:textSize="40sp"
+        android:typeface="monospace" />
+
     <FrameLayout
-        android:layout_below="@id/clock"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/frame01"
-        >
-            <dk.siit.tegg.view.EggView
-                android:id="@+id/ring_num"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="320dp"
-                android:layout_height="320dp"
-                android:src="@drawable/ring_num"
-                android:background="@drawable/ring_bg"
-                />
-    </FrameLayout>
-    <Button  android:id="@+id/ring_start"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/button_material_dark"
-        android:text="@string/alarm_start"
-        android:textColor="@color/primary_text_default_material_dark"
-        />
+        android:layout_below="@id/clock">
+
+        <dk.siit.tegg.view.EggView
+            android:id="@+id/ring_num"
+            android:layout_width="320dp"
+            android:layout_height="320dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/ring_bg"
+            android:src="@drawable/ring_num" />
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/ring_start"
+        style="@android:style/Widget.Material.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/alarm_start" />
 
 </RelativeLayout>

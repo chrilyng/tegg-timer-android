@@ -1,5 +1,6 @@
 package dk.siit.tegg;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
@@ -12,17 +13,17 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+
 import dk.siit.tegg.view.EggView;
 
-public class TeggTimer extends ActionBarActivity implements AlarmCallback, CountdownCallback {
-	private EggView mRingNum;
-	private TextView mClock;
+public class TeggTimer extends Activity implements AlarmCallback, CountdownCallback {
+    private EggView mRingNum;
+    private TextView mClock;
     private long mRemainingTime;
     private Intent mTimerService;
     private TimerService mBoundTimerService;
@@ -39,26 +40,30 @@ public class TeggTimer extends ActionBarActivity implements AlarmCallback, Count
     private static final String EXTRA_FINISHED = "FINISH";
     private static final String EXTRA_TIME_SET = "TIME_SET";
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_clock);
         doBindService();
 
-        mClock = (TextView) findViewById(R.id.clock);
-        mRingNum = (EggView) findViewById(R.id.ring_num);
+        mClock = findViewById(R.id.clock);
+        mRingNum = findViewById(R.id.ring_num);
         mRingNum.registerAlarmCallback(this);
 
-        Uri myUri =  RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Uri myUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         mRingtone = RingtoneManager.getRingtone(this, myUri);
 
-        if(getIntent().getBooleanExtra(ALARM_BROADCAST, false)&&savedInstanceState==null) {
+        if (getIntent().getBooleanExtra(ALARM_BROADCAST, false) && savedInstanceState == null) {
             mFinished = true;
 
             Window window = getWindow();
 
-            window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-            window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                    | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 
             // Play alarm
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -83,29 +88,29 @@ public class TeggTimer extends ActionBarActivity implements AlarmCallback, Count
 
             mRingtone.play();
         }
-        if(mFinished)
+        if (mFinished)
             startButton();
     }
 
     public void startButton() {
-    	Button start = (Button) findViewById(R.id.ring_start);
+        Button start = findViewById(R.id.ring_start);
         start.setText(getString(R.string.alarm_start));
         start.setOnClickListener(new Button.OnClickListener() {
-        	public void onClick(View arg0) {
-        		stopButton();
+            public void onClick(View arg0) {
+                stopButton();
 
                 mFinished = false;
 
-        		int rot = (int)-mRingNum.getClock().getRotation();
+                int rot = (int) -mRingNum.getClock().getRotation();
                 // Wheel updates every ten seconds
-                mRemainingTime = rot*10*SECOND;
+                mRemainingTime = rot * 10 * SECOND;
 
                 mTimerService = new Intent(TeggTimer.this, TimerService.class);
                 mTimerService.putExtra(ALARM_TIME, mRemainingTime);
                 startService(mTimerService);
                 doBindService();
-				mRingNum.setLocked(true);
-        	}
+                mRingNum.setLocked(true);
+            }
         });
     }
 
@@ -113,7 +118,7 @@ public class TeggTimer extends ActionBarActivity implements AlarmCallback, Count
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mFinished = savedInstanceState.getBoolean(EXTRA_FINISHED, true);
-        if(!mFinished) {
+        if (!mFinished) {
             doBindService();
             stopButton();
         } else {
@@ -124,14 +129,14 @@ public class TeggTimer extends ActionBarActivity implements AlarmCallback, Count
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(EXTRA_FINISHED, mFinished);
-        if(mFinished) {
+        if (mFinished) {
             outState.putInt(EXTRA_TIME_SET, mTimeSet);
         }
         super.onSaveInstanceState(outState);
     }
 
     public void stopButton() {
-    	Button startButton = (Button) findViewById(R.id.ring_start);
+        Button startButton = findViewById(R.id.ring_start);
         startButton.setText(getString(R.string.alarm_cancel));
         startButton.setOnClickListener(new Button.OnClickListener() {
 
@@ -148,10 +153,10 @@ public class TeggTimer extends ActionBarActivity implements AlarmCallback, Count
 
         mRingNum.updateRotation(0);
 
-        if(mIsTimerServiceBound) {
+        if (mIsTimerServiceBound) {
             mBoundTimerService.cancelAlarm();
         }
-        mClock.setText(generateText(0,0));
+        mClock.setText(generateText(0, 0));
         mRingNum.setLocked(false);
         startButton();
     }
@@ -171,10 +176,10 @@ public class TeggTimer extends ActionBarActivity implements AlarmCallback, Count
 
     @Override
     public void onBackPressed() {
-        if(!mFinished)
+        if (!mFinished)
             resetAlarm();
         else
-            finish();
+            super.onBackPressed();
     }
 
     @Override
@@ -191,7 +196,7 @@ public class TeggTimer extends ActionBarActivity implements AlarmCallback, Count
 
     @Override
     public void viewMeasured() {
-        if(mFinished) {
+        if (mFinished) {
             updateCountdown(mTimeSet * MINUTE);
         }
     }
@@ -207,20 +212,20 @@ public class TeggTimer extends ActionBarActivity implements AlarmCallback, Count
     public static String generateText(int min, int sec) {
         String minText;
         String secText;
-        if(min<10) {
-            minText = "0"+min;
+        if (min < 10) {
+            minText = "0" + min;
         } else
-            minText= ""+min;
-        if(sec<10) {
-            secText = "0"+sec;
+            minText = "" + min;
+        if (sec < 10) {
+            secText = "0" + sec;
         } else
-            secText= ""+sec;
-        return minText+":"+secText;
+            secText = "" + sec;
+        return minText + ":" + secText;
     }
 
     private ServiceConnection mTimerServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            mBoundTimerService = ((TimerService.LocalBinder)service).getService();
+            mBoundTimerService = ((TimerService.LocalBinder) service).getService();
             mBoundTimerService.registerCallback(TeggTimer.this);
         }
 

@@ -1,6 +1,7 @@
 package dk.siit.tegg;
 
 public interface AlarmCallback {
-    public void updateAlarm(int time);
-    public void viewMeasured();
+    void updateAlarm(int time);
+
+    void viewMeasured();
 }
