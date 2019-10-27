@@ -25,34 +25,36 @@ public class TimerService extends Service {
     private static final String CHANNEL_ID = "7777";
 
     private NotificationManagerCompat notificationManagerCompat;
-    private PendingIntent mAlarmSender;
-    private final IBinder mBinder = new LocalBinder();
-    private CountDownTimer mCountDownTimer;
-    private List<CountdownCallback> mCountdownCallbackList;
-    private AlarmManager mAm;
+    private AlarmManager alarmManager;
+    private PendingIntent alarmTriggeredIntent;
     private int notificationId = 0;
+
+    private final IBinder serviceBinder = new LocalBinder();
+
+    private CountDownTimer countDownTimer;
+    private List<CountdownCallback> countdownCallbackList;
 
     @Override
     public void onCreate() {
         notificationId = 0;
-        mCountdownCallbackList = new ArrayList<>();
+        countdownCallbackList = new ArrayList<>();
 
         notificationManagerCompat = NotificationManagerCompat.from(this);
 
-        mAm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         Intent intent = new Intent(this, TeggTimer.class);
         intent.putExtra(TeggTimer.ALARM_BROADCAST, true);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        mAlarmSender = PendingIntent.getActivity(this, 0, intent, 0);
+        alarmTriggeredIntent = PendingIntent.getActivity(this, 0, intent, 0);
     }
 
     @Override
     public void onDestroy() {
         notificationManagerCompat.cancel(notificationId);
 
-        if (mAm != null)
-            mAm.cancel(mAlarmSender);
+        if (alarmManager != null)
+            alarmManager.cancel(alarmTriggeredIntent);
     }
 
 
@@ -69,7 +71,7 @@ public class TimerService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        return serviceBinder;
     }
 
     private void showNotification(long timeTarget) {
@@ -89,7 +91,7 @@ public class TimerService extends Service {
                 .setContentTitle(text)
                 .setContentText(timeNotification)
                 .setContentIntent(alarmIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setPriority(NotificationCompat.PRIORITY_LOW);
         // notificationId is a unique int for each notification that you must define
         notificationManagerCompat.notify(notificationId, builder.build());
     }
@@ -100,7 +102,7 @@ public class TimerService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.alarm_service_label);
             String description = getString(R.string.alarm_service_label);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
@@ -115,39 +117,39 @@ public class TimerService extends Service {
     public void setAlarm(long time) {
         long firstTime = SystemClock.elapsedRealtime() + time;
 
-        if (mAm != null) {
-            mAm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    firstTime, mAlarmSender);
+        if (alarmManager != null) {
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    firstTime, alarmTriggeredIntent);
         }
 
-        mCountDownTimer = new CountDownTimer(time, SECOND) {
+        countDownTimer = new CountDownTimer(time, SECOND) {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                for (CountdownCallback countdownCallback : mCountdownCallbackList) {
+                for (CountdownCallback countdownCallback : countdownCallbackList) {
                     countdownCallback.updateCountdown(millisUntilFinished);
                 }
             }
 
             @Override
             public void onFinish() {
-                for (CountdownCallback countdownCallback : mCountdownCallbackList) {
+                for (CountdownCallback countdownCallback : countdownCallbackList) {
                     countdownCallback.updateCountdown(0);
                 }
             }
 
         };
-        mCountDownTimer.start();
+        countDownTimer.start();
 
         showNotification(System.currentTimeMillis() + time);
     }
 
     public void cancelAlarm() {
         notificationId = 0;
-        mCountDownTimer.cancel();
+        countDownTimer.cancel();
 
-        if (mAm != null)
-            mAm.cancel(mAlarmSender);
+        if (alarmManager != null)
+            alarmManager.cancel(alarmTriggeredIntent);
 
         notificationManagerCompat.cancelAll();
     }
@@ -159,10 +161,10 @@ public class TimerService extends Service {
     }
 
     public void registerCallback(CountdownCallback callback) {
-        mCountdownCallbackList.add(callback);
+        countdownCallbackList.add(callback);
     }
 
     public void unregisterCallback(CountdownCallback callback) {
-        mCountdownCallbackList.remove(callback);
+        countdownCallbackList.remove(callback);
     }
 }

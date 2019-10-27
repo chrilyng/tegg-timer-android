@@ -95,7 +95,6 @@ public class EggView extends View {
                     clock.setLastTouchY(y);
                     clock.setRotation(clock.getRotation() + (float) degrees);
                     int time = -(int) clock.getRotation() / CLOCK_RATIO;
-                    clock.setTime(time);
 
                     if (Math.abs(degrees) > 1) {
                         notifyObservers(time);
@@ -115,7 +114,6 @@ public class EggView extends View {
                     rotat = rotat * CLOCK_RATIO;
                     clock.setRotation(rotat);
                     int time = -rotat / CLOCK_RATIO;
-                    clock.setTime(time);
 
                     invalidate();
                     notifyObservers(time);
@@ -125,7 +123,14 @@ public class EggView extends View {
                     break;
             }
         }
+        performClick();
         return true;
+    }
+
+    @Override
+    public boolean performClick() {
+        // Do nothing
+        return super.performClick();
     }
 
     public void updateTime(long timeLeft) {
@@ -140,6 +145,7 @@ public class EggView extends View {
     }
 
     public void notifyObservers(int time) {
+        // TODO: Might make more sense to use BroadcastReceiver
         for (AlarmCallback alarmCallback : alarmCallbacks) {
             alarmCallback.updateAlarm(time);
         }
