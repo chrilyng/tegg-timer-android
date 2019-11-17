@@ -91,7 +91,7 @@ public class TimerService extends Service {
                 .setContentTitle(text)
                 .setContentText(timeNotification)
                 .setContentIntent(alarmIntent)
-                .setPriority(NotificationCompat.PRIORITY_LOW);
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         // notificationId is a unique int for each notification that you must define
         notificationManagerCompat.notify(notificationId, builder.build());
     }
